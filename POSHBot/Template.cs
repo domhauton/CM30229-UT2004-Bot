@@ -20,7 +20,7 @@ namespace Posh_sharp.POSHBot
 
         public Template(AgentBase agent)
             :base(agent,new string[] {"TemplateAction1ToBlock",
-                            "TemplateAction2ToBlock"},
+                            "TemplateAction2ToBlock", "jumpToBlock"},
                         new string[] {"TemplateSense1ToBlock",
                             "TemplateSense2ToBlock"})
         {
@@ -66,6 +66,14 @@ namespace Posh_sharp.POSHBot
         * ACTIONS 
         * 
         */
+
+        [ExecutableAction("jump")]
+        public bool jump()
+        {
+            GetBot().SendMessage("JUMP", new Dictionary<string, string>());
+
+            return true;
+        }
 
         /// <summary>
         /// This is a template action that can be used to modify the agent behaviour.
