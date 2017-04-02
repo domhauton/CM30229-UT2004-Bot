@@ -71,7 +71,7 @@ namespace Posh_sharp.POSHBot
         public bool jump()
         {
             GetBot().SendMessage("JUMP", new Dictionary<string, string>());
-
+            //Console.Out.WriteLine("Debug: Attempt to jump");
             return true;
         }
 

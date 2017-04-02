@@ -4,25 +4,25 @@
 # won't be used.
 
 [POSHBot]
-POSHBot.botname = Delila
+POSHBot.botname = Bot11
 POSHBot.team = 1
 POSHBot.ip = 127.0.0.1
 POSHBot.port = 3000
 
 [POSHBot]
-POSHBot.botname = Delila
+POSHBot.botname = Bot12
 POSHBot.team = 1
 POSHBot.ip = 127.0.0.1
 POSHBot.port = 3000
 
 [POSHBot]
-POSHBot.botname = Delila
+POSHBot.botname = Bot21
 POSHBot.team = 2
 POSHBot.ip = 127.0.0.1
 POSHBot.port = 3000
 
 [POSHBot]
-POSHBot.botname = Delila
+POSHBot.botname = Bot22
 POSHBot.team = 2
 POSHBot.ip = 127.0.0.1
 POSHBot.port = 3000

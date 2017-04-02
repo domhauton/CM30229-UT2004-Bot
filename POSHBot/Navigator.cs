@@ -53,7 +53,7 @@ namespace Posh_sharp.POSHBot
 		override internal void ReceiveCheckReachDetails(Dictionary<string, string> valuesDict)
 		{
 			if (_debug_)
-				Console.Out.WriteLine("Navigator: in receive_rch_details");
+				Console.Out.WriteLine("[INFO ] Navigator: Recieved Check Reach Details");
 
 			if (!valuesDict.ContainsKey("Id"))
 				return;

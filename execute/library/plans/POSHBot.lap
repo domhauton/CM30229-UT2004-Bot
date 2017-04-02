@@ -3,16 +3,30 @@
 ; lost the next time the tool is used.
 ; -------------------------------------------------------------
 (
+(documentation "Your Title" "Your Name" "Your file comments")
 (AP AP-inch (seconds 1.0) (
 	idle
 ))
 (AP AP-moveing (minutes 1.0) (
 	moveto_navpoint
 ))
+(AP AP-jump (minutes 1.0) (
+	jump 
+	moveto_navpoint
+))
+(AP AP-attack-carrier (minutes 1.0) (
+	RunToEnemyCarryingOurFlag 
+	ShootEnemyCarryingOurFlag
+))
+(AP AP-attack-any-enemy (minutes 1.0) (
+	SetAttacker 
+	FaceAttacker 
+	ShootAttacker
+))
 (C wander-map (seconds 2.0) (goal ((focusing_task 1.0 =)))
 	(elements
 		(	(CE-moveto-navpoint (trigger ((selected_target 1.0 =) (reached_target 0.0 =))) moveto-selected-nav)	)
-		(	(CE-find-nxt-waypoint (trigger ((close_navpoint 1.0 =))) select_navpoint )	)
+		(	(CE-find-nxt-waypoint (trigger ((close_navpoint 1.0 =))) select_navpoint)	)
 	)
 )
 (C get-enemy-flag (seconds 30.0) (goal ((have_enemy_flag 1.0 =)))
@@ -32,8 +46,26 @@
 		(	(CE-moveto-navpoint (trigger ((close_navpoint 1.0 =) (is_walking 1.0 !=) (selected_navpoint_reachable 1.0 =))) moveto_navpoint)	)
 	)
 )
+(C get-own-flag (seconds 1.0) (goal ((OurFlagOnGround 1.0 !=)))
+	(elements
+		(	(CE-reach-flag (trigger ((selected_target 1.0 =) (reached_target 0.0 =))) moveto-selected-nav)	)
+		(	(CE-grab-flag (trigger ((OurFlagOnGround 1.0 =))) select_own_flag)	)
+	)
+)
 (SRDC life (goal ((game_ended 1.0 =)))
 	(drives
+		(
+
+		(jumping (trigger ((IsStuck 1.0 ==))) AP-jump(seconds 1.0)))
+		(
+
+		(attack-carrier (trigger ((SeeEnemyWithOurFlag 1.0 =))) AP-attack-carrier))
+		(
+
+		(attack-any-enemy (trigger ((SeeEnemy 1.0 =) (ArmedAndAmmo 1.0 =))) AP-attack-any-enemy(seconds 0.1)))
+		(
+
+		(return-own-flag (trigger ((OurFlagOnGround 1.0 =))) get-own-flag))
 		(
 
 		(return-enemy-flag (trigger ((have_enemy_flag 1.0 =))) retrace-back(seconds 0.3)))
@@ -45,7 +77,7 @@
 		(wander_around (trigger ((focusing_task 1.0 !=))) wander-map(seconds 0.3)))
 		(
 
-		(inch (trigger ((succeed))) AP-inch(seconds 0.1)))
+		(inch (trigger ((succeed))) AP-inch))
 
 	)
 )

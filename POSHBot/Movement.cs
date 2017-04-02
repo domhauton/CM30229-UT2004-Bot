@@ -17,17 +17,13 @@ namespace Posh_sharp.POSHBot
         string pathToEnemyBaseId;
         string reachPathToEnemyBaseID;
 
-        public Movement(AgentBase agent)
-            : base(agent,
-            new string[] {},
-            new string[] {})
+        public Movement(AgentBase agent) : base(agent, new string[] {}, new string[] {})
         {
             this.info = new PositionsInfo();
             pathHomeId = "PathHome";
             reachPathHomeId = "ReachPathHome";
             pathToEnemyBaseId = "PathThere";
             reachPathToEnemyBaseID = "ReachPathThere";
-
         }
 
 
@@ -101,7 +97,7 @@ namespace Posh_sharp.POSHBot
         /// <param name="valuesDict"></param>
         override internal void ReceiveCheckReachDetails(Dictionary<string, string> valuesDict)
         {
-            Console.Out.WriteLine("in receive_rch_details");
+            Console.Out.WriteLine("[INFO ] Recieved check reach details");
 
             if (!valuesDict.ContainsKey("Id"))
                 return;
@@ -250,8 +246,6 @@ namespace Posh_sharp.POSHBot
         [ExecutableSense("IsStuck")]
         public bool IsStuck()
         {
-            // print "Stuck"
-
             return GetBot().Stuck();
         }
 
