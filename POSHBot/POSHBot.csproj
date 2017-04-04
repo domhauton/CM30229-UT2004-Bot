@@ -52,11 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Navigator.cs" />
+    <Compile Include="Movement.cs" />
     <Compile Include="POSHBot.cs" />
     <Compile Include="Combat.cs" />
-    <Compile Include="Movement.cs" />
     <Compile Include="Status.cs" />
-    <Compile Include="Runner.cs" />
+    <Compile Include="RunnerBehaviour.cs" />
     <Compile Include="Template.cs" />
     <Compile Include="util\CombatInfo.cs" />
     <Compile Include="util\Damage.cs" />
@@ -64,11 +65,11 @@
     <Compile Include="util\NavPoint.cs" />
     <Compile Include="util\PositionsInfo.cs" />
     <Compile Include="util\Projectile.cs" />
+    <Compile Include="util\AdvancedUTBehaviour.cs" />
     <Compile Include="util\UTBehaviour.cs" />
     <Compile Include="util\UTPlayer.cs" />
     <Compile Include="util\Vector3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Navigator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="init\POSHBot_init.txt">

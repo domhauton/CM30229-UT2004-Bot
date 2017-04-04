@@ -13,7 +13,7 @@ namespace Posh_sharp.POSHBot {
     /// This class presents a template for creating a new Behaviour for UT2004 based agents. It is not intended to be used as is but modified and renamed.
     /// Once your own UTBehaviour is created by renaming this class you will receive ann information about the virtual environment at runtime and can execute actions. 
     /// </summary>
-    public class Runner : UTBehaviour {
+    public class RunnerBehaviour : UTBehaviour {
         internal CombatInfo info;
 
         // You must list all actions here
@@ -26,7 +26,7 @@ namespace Posh_sharp.POSHBot {
         };
 
 
-        public Runner(AgentBase agent) : base(agent, actions, senses) {
+        public RunnerBehaviour(AgentBase agent) : base(agent, actions, senses) {
             info = new CombatInfo();
         }
 
