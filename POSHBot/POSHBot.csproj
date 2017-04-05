@@ -52,10 +52,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdvancedNavigator.cs" />
+    <Compile Include="AdvancedMovement.cs" />
+    <Compile Include="AdvancedCombat.cs" />
     <Compile Include="Navigator.cs" />
     <Compile Include="Movement.cs" />
     <Compile Include="POSHBot.cs" />
     <Compile Include="Combat.cs" />
+    <Compile Include="AdvancedStatus.cs" />
     <Compile Include="Status.cs" />
     <Compile Include="RunnerBehaviour.cs" />
     <Compile Include="Template.cs" />

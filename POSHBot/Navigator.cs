@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using Posh_sharp.POSHBot.util;
 using POSH.sys;
 using System.Collections.Generic;
 using POSH.sys.annotations;
 
 namespace Posh_sharp.POSHBot {
-    public class Navigator : AdvancedUTBehaviour {
+    public class Navigator : UTBehaviour {
         private NavPoint __selectedNavpoint__;
         private string __closestNavpointID__;
         private string __lastVisitedNavpoint__;
@@ -18,23 +18,9 @@ namespace Posh_sharp.POSHBot {
         private int directionWeight;
 
 
-        // You must list all actions here
-        private readonly static string[] actions = new string[] {
-            //"nav_select_navpoint",
-            //"nav_select_enemy_flag",
-            //"nav_select_own_flag",
-            //"nav_retrace_navpoint"
-        };
-
-        // You must list all senses here
-        private readonly static string[] senses = new string[] {
-            //"nav_is_target_selected",
-            //"nav_has_reached_target",
-            //"nav_is_close_to_navpoint",
-            //"nav_is_selected_navpoint_reachable"
-        };
-
-        public Navigator(AgentBase agent) : base(agent, actions, senses) {
+        public Navigator(AgentBase agent)
+            : base(agent, new string[] { },
+            new string[] { }) {
             closestNavPointReachable = new Dictionary<string, bool>();
             navPointHistory = new Dictionary<string, int>();
             navPoints = new Dictionary<string, NavPoint>();
@@ -62,7 +48,7 @@ namespace Posh_sharp.POSHBot {
         /// <param name="valuesDict"></param>
         override internal void ReceiveCheckReachDetails(Dictionary<string, string> valuesDict) {
             if (_debug_)
-                Console.Out.WriteLine("[INFO ] Navigator: Recieved Check Reach Details");
+                Console.Out.WriteLine("Navigator: in receive_rch_details");
 
             if (!valuesDict.ContainsKey("Id"))
                 return;
@@ -177,33 +163,33 @@ namespace Posh_sharp.POSHBot {
          * 
          */
 
-        [ExecutableAction("nav_select_navpoint")]
+        [ExecutableAction("select_navpoint")]
         public bool select_navpoint() {
             if (_debug_)
-                Console.Out.WriteLine("in nav_select_navpoint");
+                Console.Out.WriteLine("in select_navpoint");
             return select_navpoint("");
         }
 
-        [ExecutableAction("nav_select_enemy_flag")]
+        [ExecutableAction("select_enemy_flag")]
         public bool select_enemy_flag() {
             if (_debug_)
-                Console.Out.WriteLine("in nav_select_enemy_flag");
+                Console.Out.WriteLine("in select_enemy_flag");
             return select_flag(false);
         }
 
-        [ExecutableAction("nav_select_own_flag")]
+        [ExecutableAction("select_own_flag")]
         public bool select_own_flag() {
             if (_debug_)
-                Console.Out.WriteLine("in nav_select_own_flag");
+                Console.Out.WriteLine("in select_own_flag");
             return select_flag(true);
         }
 
-        [ExecutableAction("nav_retrace_navpoint")]
+        [ExecutableAction("retrace_navpoint")]
         public bool retrace_navpoint() {
             directionWeight = -1;
 
             if (_debug_)
-                Console.Out.WriteLine("in nav_retrace_navpoint");
+                Console.Out.WriteLine("in retrace_navpoint");
 
             if (__closestNavpointID__ == "")
                 return false;
@@ -265,10 +251,10 @@ namespace Posh_sharp.POSHBot {
         /// sense to check if a target is currently selected
         /// </summary>
         /// <returns><c>true</c>, if target was selecteded, <c>false</c> otherwise.</returns>
-        [ExecutableSense("nav_is_target_selected")]
-        public bool nav_is_target_selected() {
+        [ExecutableSense("selected_target")]
+        public bool selected_target() {
             if (_debug_)
-                Console.Out.WriteLine("in nav_is_target_selected");
+                Console.Out.WriteLine("in selected_target");
 
             if (__selectedNavpoint__ != null && __selectedNavpoint__.Location != Vector3.NullVector())
                 return true;
@@ -276,10 +262,10 @@ namespace Posh_sharp.POSHBot {
             return false;
         }
 
-        [ExecutableSense("nav_has_reached_target")]
-        public bool nav_has_reached_target() {
+        [ExecutableSense("reached_target")]
+        public bool reached_target() {
             if (_debug_)
-                Console.Out.WriteLine("in nav_reached_target");
+                Console.Out.WriteLine("in reached_target");
             if (__selectedNavpoint__ != null
                 && __selectedNavpoint__.Location != Vector3.NullVector()
                 && __selectedNavpoint__.Distance2DFrom(Vector3.ConvertToVector3(GetBot().info["Location"]), Vector3.Orientation.XY) < __deviation__)
@@ -290,10 +276,10 @@ namespace Posh_sharp.POSHBot {
         /// <summary>
         /// sense to find the closest navpoint to current location or to specific location
         /// </summary>
-        [ExecutableSense("nav_is_close_to_navpoint")]
-        public bool nav_is_close_to_navpoint() {
+        [ExecutableSense("close_navpoint")]
+        public bool close_navpoint() {
             if (_debug_)
-                Console.Out.WriteLine("in nav_close_navpoint");
+                Console.Out.WriteLine("in close_navpoint");
 
             NavPoint target = null;
             float distance;
@@ -333,10 +319,10 @@ namespace Posh_sharp.POSHBot {
         /// <summary>
         /// Checks if the the selected navpoint is a neighbor of the current/closeby navpoint. Neighbor checks are based on the navgrid which is static and contains all useable paths
         /// </summary>
-        [ExecutableSense("nav_is_selected_navpoint_reachable")]
-        public bool nav_is_selected_navpoint_reachable() {
+        [ExecutableSense("selected_navpoint_reachable")]
+        public bool selected_navpoint_reachable() {
             if (_debug_)
-                Console.Out.WriteLine("in nav_selected_navpoint_reachable");
+                Console.Out.WriteLine("in selected_navpoint_reachable");
 
             if (__selectedNavpoint__ == null || !navPoints.ContainsKey(__closestNavpointID__))
                 return false;
@@ -353,4 +339,3 @@ namespace Posh_sharp.POSHBot {
 
     }
 }
-

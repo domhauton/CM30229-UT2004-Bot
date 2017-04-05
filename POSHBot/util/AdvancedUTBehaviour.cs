@@ -9,5 +9,17 @@ namespace Posh_sharp.POSHBot.util {
         public AdvancedUTBehaviour(AgentBase agent, string[] actions, string[] senses) : base(agent, actions, senses) {
 
         }
+
+        protected AdvancedMovement GetAdvancedMovement() {
+            return ((AdvancedMovement) agent.getBehaviour("AdvancedMovement"));
+        }
+
+        protected AdvancedCombat GetAdvancedCombat() {
+            return ((AdvancedCombat) agent.getBehaviour("AdvancedCombat"));
+        }
+
+        protected AdvancedNavigator GetAdvancedNavigator() {
+            return ((AdvancedNavigator) agent.getBehaviour("AdvancedNavigator"));
+        }
     }
 }

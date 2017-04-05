@@ -4,33 +4,34 @@
 		mov_idle
 	))
 	(AP AP-jump-obstacle (seconds 1.0) (
-		jump 
+		mov_jump
 		mov_move_to_navpoint
 	))
 	(AP AP-attack-carrier (seconds 0.3) (
-		RunToEnemyCarryingOurFlag 
-		ShootEnemyCarryingOurFlag
+		com_run_to_enemy_carrying_our_flag
+		com_shoot_enemy_carrying_our_flag
 	))
 	(AP AP-attack-any-enemy (seconds 0.3) (
-		SetAttacker 
-		FaceAttacker 
-		ShootAttacker
+		com_set_attacker
+		com_face_attacker
+		com_shoot_attacker
 	))
 	(C C-move-to-selected-nav (seconds 0.5) (goal ((nav_has_reached_target 1.0 =)))
 		(elements
+		    ((CE-jump-obstacle              (trigger ((mov_is_stuck 1.0 =)))																				AP-jump-obstacle ))
 			((CE-move-to-navpoint			(trigger ((nav_is_close_to_navpoint 1.0 =) (mov_is_walking 1.0 !=) (nav_is_selected_navpoint_reachable 1.0 =))) mov_move_to_navpoint))
 		)
 	)
-	(C C-wander-map (seconds 0.3) (goal ((focusing_task 1.0 =)))
+	(C C-wander-map (seconds 0.3) (goal ((status_focusing_task 1.0 =)))
 		(elements
 			((CE-move-to-navpoint			(trigger ((nav_is_target_selected 1.0 =) (nav_has_reached_target 0.0 =)))	C-move-to-selected-nav))
 			((CE-find-nxt-waypoint			(trigger ((nav_is_close_to_navpoint 1.0 =)))								nav_select_navpoint))
 		)
 	)
-	(C C-get-enemy-flag (seconds 0.3) (goal ((have_enemy_flag 1.0 =)))
+	(C C-get-enemy-flag (seconds 0.3) (goal ((status_have_enemy_flag 1.0 =)))
 		(elements
 			((CE-move-to-flag				(trigger ((nav_is_target_selected 1.0 =) (nav_has_reached_target 0.0 =)))	C-move-to-selected-nav))
-			((CE-select-enemy-flag			(trigger ((have_enemy_flag 1.0 !=)))										nav_select_enemy_flag))
+			((CE-select-enemy-flag			(trigger ((status_have_enemy_flag 1.0 !=)))									nav_select_enemy_flag))
 		)
 	)
 	(C C-retrace-back (seconds 0.3) (goal ((mov_is_at_own_base 1.0 =)))
@@ -39,21 +40,21 @@
 			((CE-retrace-home				(trigger ((nav_is_close_to_navpoint 1.0 =)))								nav_retrace_navpoint))
 		)
 	)
-	(C C-get-own-flag (seconds 1.0) (goal ((OurFlagOnGround 1.0 !=)))
+	(C C-get-own-flag (seconds 1.0) (goal ((com_is_our_flag_on_ground 1.0 !=)))
 		(elements
 			((CE-reach-flag					(trigger ((nav_is_target_selected 1.0 =) (nav_has_reached_target 0.0 =)))	C-move-to-selected-nav))
-			((CE-grab-flag					(trigger ((OurFlagOnGround 1.0 =)))											nav_select_own_flag))
+			((CE-grab-flag					(trigger ((com_is_our_flag_on_ground 1.0 =)))								nav_select_own_flag))
 		)
 	)
-	(SRDC life (goal ((game_ended 1.0 =)))
+	(SRDC life (goal ((status_game_ended 1.0 =)))
 		(drives
-			((jump-obstacle					(trigger ((mov_is_stuck 1.0 ==)))						AP-jump-obstacle))
-			((attack-carrier				(trigger ((SeeEnemyWithOurFlag 1.0 =)))					AP-attack-carrier))
+			((attack-carrier				(trigger ((com_can_see_enemy_with_flag 1.0 =)))			AP-attack-carrier))
 			((attack-any-enemy				(trigger ((mov_see_enemy 1.0 =) (ArmedAndAmmo 1.0 =)))	AP-attack-any-enemy))
-			((return-own-flag				(trigger ((OurFlagOnGround 1.0 =)))						C-get-own-flag))
-			((return-enemy-flag				(trigger ((have_enemy_flag 1.0 =)))						C-retrace-back))
+			((return-own-flag				(trigger ((com_is_our_flag_on_ground 1.0 =)))			C-get-own-flag))
+			((return-enemy-flag				(trigger ((status_have_enemy_flag 1.0 =)))				C-retrace-back))
 			((get-enemy-flag-from-base		(trigger ((mov_is_enemy_flag_reachable 1.0 =)))			C-get-enemy-flag))
-			((wander_around					(trigger ((focusing_task 1.0 !=)))						C-wander-map))
+			((wander_around					(trigger ((status_focusing_task 1.0 !=)))				C-wander-map))
+			((jump-obstacle					(trigger ((mov_is_stuck 1.0 =)))						AP-jump-obstacle))
 			((inch							(trigger ((succeed)))									AP-inch))
 		)
 	)

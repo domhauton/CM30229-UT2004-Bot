@@ -19,22 +19,19 @@ namespace Posh_sharp.POSHBot.util
 			return ((POSHBot)agent.getBehaviour("POSHBot"));
         }
 
-        protected Movement GetMovement()
-        {
-			return ((Movement)agent.getBehaviour("Movement"));
+        protected Movement GetMovement() {
+            return ((Movement)agent.getBehaviour("Movement"));
         }
 
-        protected Combat GetCombat()
-        {
-			return ((Combat)agent.getBehaviour("Combat"));
-        } 
+        protected Combat GetCombat() {
+            return ((Combat)agent.getBehaviour("Combat"));
+        }
 
-		protected Navigator GetNavigator()
-		{
-			return ((Navigator)agent.getBehaviour("Navigator"));
-		}
+        protected Navigator GetNavigator() {
+        	return ((Navigator) agent.getBehaviour("Navigator"));
+        }
 
-        internal virtual void ReceiveFlagDetails(Dictionary<string,string> values)
+    internal virtual void ReceiveFlagDetails(Dictionary<string,string> values)
         {
             if (_debug_)
                 Console.Out.WriteLine("in ReceiveFlagDetails");
