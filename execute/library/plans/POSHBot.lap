@@ -4,7 +4,7 @@
 		mov_idle
 	))
 	(AP AP-jump-obstacle (seconds 1.0) (
-		mov_jump
+		mov_delayed_double_jump
 		mov_move_to_navpoint
 	))
 	(AP AP-attack-carrier (seconds 0.3) (
@@ -14,12 +14,14 @@
 	(AP AP-attack-any-enemy (seconds 0.3) (
 		com_set_attacker
 		com_face_attacker
+		mov_crouch_short
 		com_shoot_attacker
 	))
 	(C C-move-to-selected-nav (seconds 0.5) (goal ((nav_has_reached_target 1.0 =)))
 		(elements
-		    ((CE-jump-obstacle              (trigger ((mov_is_stuck 1.0 =)))																				AP-jump-obstacle ))
-			((CE-move-to-navpoint			(trigger ((nav_is_close_to_navpoint 1.0 =) (mov_is_walking 1.0 !=) (nav_is_selected_navpoint_reachable 1.0 =))) mov_move_to_navpoint))
+			((CE-jump-obstacle              (trigger ((mov_is_stuck 1.0 =)))																				AP-jump-obstacle ))
+		    ((CE-jump-obstacle-base         (trigger ((mov_is_at_own_base 1.0 =)))																			AP-jump-obstacle ))
+			((CE-move-to-navpoint			(trigger ((nav_is_close_to_navpoint 1.0 =) (mov_is_walking 1.0 !=))) AP-jump-obstacle))
 		)
 	)
 	(C C-wander-map (seconds 0.3) (goal ((status_focusing_task 1.0 =)))
@@ -46,6 +48,12 @@
 			((CE-grab-flag					(trigger ((com_is_our_flag_on_ground 1.0 =)))								nav_select_own_flag))
 		)
 	)
+	(C C-go-to-enemy-base (seconds 1.0) (goal ((mov_is_at_enemy_base 1.0 =)))
+		(elements
+			((CE-enemy-base-navpoint		(trigger ((nav_is_target_selected 1.0 =) (nav_has_reached_target 0.0 =)))	C-move-to-selected-nav))
+			((CE-set-enemy-base-as-navpoint (trigger ((mov_know_enemy_base_pos 1.0 =)))									nav_select_enemy_base))
+		)
+	)
 	(SRDC life (goal ((status_game_ended 1.0 =)))
 		(drives
 			((attack-carrier				(trigger ((com_can_see_enemy_with_flag 1.0 =)))			AP-attack-carrier))
@@ -53,6 +61,7 @@
 			((return-own-flag				(trigger ((com_is_our_flag_on_ground 1.0 =)))			C-get-own-flag))
 			((return-enemy-flag				(trigger ((status_have_enemy_flag 1.0 =)))				C-retrace-back))
 			((get-enemy-flag-from-base		(trigger ((mov_is_enemy_flag_reachable 1.0 =)))			C-get-enemy-flag))
+			((walk-to-enemy-base			(trigger ((mov_know_enemy_base_pos 1.0 =) (mov_is_at_own_base 1.0 =)))	C-go-to-enemy-base))
 			((wander_around					(trigger ((status_focusing_task 1.0 !=)))				C-wander-map))
 			((jump-obstacle					(trigger ((mov_is_stuck 1.0 =)))						AP-jump-obstacle))
 			((inch							(trigger ((succeed)))									AP-inch))

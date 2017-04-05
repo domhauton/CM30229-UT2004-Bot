@@ -3,12 +3,13 @@ using Posh_sharp.POSHBot.util;
 using POSH.sys;
 using System.Collections.Generic;
 using POSH.sys.annotations;
+using System.Reflection;
 
 namespace Posh_sharp.POSHBot {
     public class AdvancedNavigator : AdvancedUTBehaviour {
 
-        private int directionWeight;
-
+        private readonly FieldInfo navPointsField;
+    
 
         // You must list all actions here
         private readonly static string[] actions = new string[] {
@@ -16,6 +17,7 @@ namespace Posh_sharp.POSHBot {
             //"nav_select_enemy_flag",
             //"nav_select_own_flag",
             //"nav_retrace_navpoint"
+            //"nav_select_enemy_base""nav_select_enemy_base"
         };
 
         // You must list all senses here
@@ -27,7 +29,8 @@ namespace Posh_sharp.POSHBot {
         };
 
         public AdvancedNavigator(AgentBase agent) : base(agent, actions, senses) {
-            // Empty constructor
+            Type fieldsType = typeof(Navigator);
+            navPointsField = fieldsType.GetField("navPoints", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         [ExecutableAction("nav_select_navpoint")]
@@ -48,6 +51,19 @@ namespace Posh_sharp.POSHBot {
         [ExecutableAction("nav_retrace_navpoint")]
         public bool retrace_navpoint() {
             return GetNavigator().retrace_navpoint();
+        }
+
+        [ExecutableAction("nav_select_enemy_base")]
+        public bool SetEnemyBaseAsNavPoint() {
+            NavPoint enemyBasePos = GetMovement().info.enemyBasePos;
+            if(enemyBasePos != null) {
+                //GetNavigator().select_navpoint();
+                GetNavigator().MovedToNavpoint(enemyBasePos);
+                //GetNavigator().select_navpoint(enemyBasePos.Id);
+            } else {
+                GetNavigator().select_navpoint();
+            }
+            return true;
         }
 
         /*
@@ -93,6 +109,15 @@ namespace Posh_sharp.POSHBot {
         [ExecutableSense("nav_is_selected_navpoint_reachable")]
         public bool nav_is_selected_navpoint_reachable() {
             return GetNavigator().selected_navpoint_reachable();
+        }
+
+        private bool AStarPathFinder() {
+            Navigator navigator = GetNavigator();
+            Dictionary<string, NavPoint> navPoints = (Dictionary<string, NavPoint>) navPointsField.GetValue(navigator);
+
+
+
+            return true;
         }
 
     }

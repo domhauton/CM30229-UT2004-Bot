@@ -376,7 +376,6 @@ namespace Posh_sharp.POSHBot
                 if(client.Connected)
                 {
                     stream = client.GetStream();
-                    
                 }
             }
             catch (Exception)

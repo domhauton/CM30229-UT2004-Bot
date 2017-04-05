@@ -6,9 +6,16 @@ using POSH.sys;
 using POSH.sys.annotations;
 using Posh_sharp.POSHBot.util;
 using POSH.sys.strict;
+using System.Threading;
 
 namespace Posh_sharp.POSHBot {
     public class AdvancedMovement : AdvancedUTBehaviour {
+
+        private readonly static int doubleJumpWaitTimerMS = 150;
+        private readonly static int jumpDelayMS = 500;
+        private readonly static int shortCrouchTimeMS = 1500;
+
+        private volatile int crouchCounter = 0; 
 
         // You must list all actions here
         private readonly static string[] actions = new string[] {
@@ -18,6 +25,8 @@ namespace Posh_sharp.POSHBot {
             //"mov_rotate",
             //"mov_big_rotate",
             //"mov_walk_to_nav_point"
+            //"mov_jump"
+            //"mov_double_jump"
         };
 
         // You must list all senses here
@@ -193,11 +202,59 @@ namespace Posh_sharp.POSHBot {
         }
 
         [ExecutableAction("mov_jump")]
-        public bool mov_jump() {
-            GetBot().SendMessage("JUMP", new Dictionary<string, string>());
+        public bool SingleJump() {
+            SendMessageAsync("JUMP", new Dictionary<string, string>());
             if (_debug_) {
                 Console.Out.WriteLine("Debug: Attempt to jump");
             }
+            return true;
+        }
+
+        [ExecutableAction("mov_double_jump")]
+        public bool DoubleJump() {
+            GetBot().SendMessage("Double JUMP", new Dictionary<string, string>());
+            if (_debug_) {
+                Console.Out.WriteLine("Debug: Attempt to double jump");
+            }
+            SendMessageAsync("JUMP", new Dictionary<string, string>() { {"DoubleJump", "true"} });
+
+            return true;
+        }
+
+        [ExecutableAction("mov_delayed_double_jump")]
+        public bool DelayedDoubleJump() {
+            GetBot().SendMessage("Delayed Double JUMP", new Dictionary<string, string>());
+            new Thread(() => {
+                Thread.Sleep(jumpDelayMS);
+                DoubleJump();
+            }).Start();
+
+            return true;
+        }
+
+        [ExecutableAction("mov_crouch")]
+        public bool Crouch() {
+            SendMessageAsync("SETCROUCH", new Dictionary<string, string>() { { "Crouch", "True" } });
+            return true;
+        }
+
+        [ExecutableAction("mov_uncrouch")]
+        public bool Uncrouch() {
+            SendMessageAsync("SETCROUCH", new Dictionary<string, string>() { { "Crouch", "false" } });
+            return true;
+        }
+
+        [ExecutableAction("mov_crouch_short")]
+        public bool CrouchShort() {
+            Crouch();
+            Interlocked.Increment(ref this.crouchCounter);
+            new Thread(() => {
+                Thread.Sleep(shortCrouchTimeMS);
+                int crouchValue = Interlocked.Decrement(ref this.crouchCounter);
+                if(crouchValue == 0) {
+                    Uncrouch();
+                }
+            }).Start();
             return true;
         }
     }

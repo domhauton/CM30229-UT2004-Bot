@@ -6,6 +6,7 @@ using POSH.sys;
 using POSH.sys.annotations;
 using Posh_sharp.POSHBot.util;
 using POSH.sys.strict;
+using System.Net.Sockets;
 //import utilityfns
 
 namespace Posh_sharp.POSHBot
