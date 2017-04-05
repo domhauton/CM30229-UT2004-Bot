@@ -198,6 +198,10 @@ namespace Posh_sharp.POSHBot {
         /// <returns></returns>
         [ExecutableAction("mov_walk_to_nav_point")]
         public bool mov_walk_to_nav_point() {
+            NavPoint selectedNavPoint = GetNavigator().GetSelectedNavpoint();
+            if(selectedNavPoint == null || GetNavigator().reached_target()) {
+                GetNavigator().select_navpoint();
+            }
             return GetMovement().WalkToNavPoint();
         }
 

@@ -12,6 +12,9 @@ namespace Posh_sharp.POSHBot {
         private readonly FieldInfo navPointsField;
         private readonly FieldInfo closestNavPointField;
 
+        private NavPoint ourRoughFlagPosition;
+        private NavPoint theirRoughFlagPosition;
+
         // You must list all actions here
         private readonly static string[] actions = new string[] {
             //"nav_select_navpoint",
@@ -57,13 +60,29 @@ namespace Posh_sharp.POSHBot {
 
         [ExecutableAction("nav_select_enemy_base")]
         public bool SetEnemyBaseAsNavPoint() {
-            NavPoint enemyBasePos = GetMovement().info.enemyBasePos;
-            if(enemyBasePos != null) {
-                NavPoint nextBestNavPoint = AStarPathFinder(enemyBasePos.Id);
-                GetNavigator().select_navpoint(nextBestNavPoint.Id);
-            } else {
-                GetNavigator().select_navpoint();
+            if(ourRoughFlagPosition == null || theirRoughFlagPosition == null) {
+                NavPoint ourNavPoint = GetClosestNavPoint();
+                Tuple<NavPoint, NavPoint> result = CalcCloseAndFurthestNav(ourNavPoint, 3);
+                ourRoughFlagPosition = result.First;
+                theirRoughFlagPosition = CalcCloseAndFurthestNav(result.Second, 3).First;
             }
+            
+             NavPoint nextBestNavPoint = AStarPathFinder(theirRoughFlagPosition.Id);
+             GetNavigator().select_navpoint(nextBestNavPoint.Id);
+            return true;
+        }
+
+        [ExecutableAction("nav_select_our_base")]
+        public bool SetOurBaseAsNavPoint() {
+            if (ourRoughFlagPosition == null || theirRoughFlagPosition == null) {
+                NavPoint ourNavPoint = GetClosestNavPoint();
+                Tuple<NavPoint, NavPoint> result = CalcCloseAndFurthestNav(ourNavPoint, 3);
+                ourRoughFlagPosition = result.First;
+                theirRoughFlagPosition = CalcCloseAndFurthestNav(result.Second, 3).First;
+            }
+
+            NavPoint nextBestNavPoint = AStarPathFinder(ourRoughFlagPosition.Id);
+            GetNavigator().select_navpoint(nextBestNavPoint.Id);
             return true;
         }
 
@@ -110,6 +129,65 @@ namespace Posh_sharp.POSHBot {
         [ExecutableSense("nav_is_selected_navpoint_reachable")]
         public bool nav_is_selected_navpoint_reachable() {
             return GetNavigator().selected_navpoint_reachable();
+        }
+
+        /// <summary>
+        /// Calculates rough flag positions based on spawn point.
+        /// </summary>
+        private Tuple<NavPoint, NavPoint> CalcCloseAndFurthestNav(NavPoint startNavPoint, int closeDistance) {
+            Navigator navigator = GetNavigator();
+            Dictionary<string, NavPoint> navPoints = (Dictionary<string, NavPoint>)navPointsField.GetValue(navigator);
+
+            String closestNavPointKey = startNavPoint.Id;
+            NavPoint closestNavPoint = startNavPoint;
+
+            HashSet<String> allNavPointIds = new HashSet<String>(navPoints.Keys);
+
+            HashSet<String> usedNavPointIds = new HashSet<String>();
+            usedNavPointIds.Add(closestNavPoint.Id);
+
+            List<Tuple<NavPoint, NavPoint, int>> currentNavPointPairList = new List<Tuple<NavPoint, NavPoint, int>>();
+
+            foreach (Neighbor navPoint in closestNavPoint.NGP) {
+                String id = navPoint.Id;
+                NavPoint neighbourNavPoint = navPoints[id];
+                usedNavPointIds.Add(id);
+                currentNavPointPairList.Add(new Tuple<NavPoint, NavPoint, int>(neighbourNavPoint, neighbourNavPoint, 0));
+            }
+
+            Tuple<NavPoint, NavPoint> returnVal = new Tuple<NavPoint, NavPoint>(closestNavPoint, closestNavPoint);
+
+            NavPoint closeNavPoint = closestNavPoint;
+            NavPoint furthestNavPoint = closestNavPoint;
+
+            while (!usedNavPointIds.SetEquals(allNavPointIds) || currentNavPointPairList.Count == 0) {
+                List<Tuple<NavPoint, NavPoint, int>> newNavPointSet = new List<Tuple<NavPoint, NavPoint, int>>();
+                foreach (Tuple<NavPoint, NavPoint, int> navPointTuple in currentNavPointPairList) {
+                    foreach (Neighbor navPoint in navPointTuple.Second.NGP) {
+                        String id = navPoint.Id;
+                        NavPoint neighbourNavPoint = navPoints[id];
+                        if (navPointTuple.Third == closeDistance) {
+                            closeNavPoint = navPointTuple.Second;
+                        }
+                        if (!usedNavPointIds.Contains(id)) {
+                            usedNavPointIds.Add(id);
+                            furthestNavPoint = neighbourNavPoint;
+                            newNavPointSet.Add(new Tuple<NavPoint, NavPoint, int>(navPointTuple.First, neighbourNavPoint, navPointTuple.Third+1));
+                        }
+                    }
+                }
+                currentNavPointPairList = newNavPointSet;
+            }
+
+            return new Tuple<NavPoint, NavPoint>(closeNavPoint, furthestNavPoint);
+        }
+
+        private NavPoint GetClosestNavPoint() {
+            Navigator navigator = GetNavigator();
+            Dictionary<string, NavPoint> navPoints = (Dictionary<string, NavPoint>)navPointsField.GetValue(navigator);
+            navigator.close_navpoint();
+            String closestNavPointKey = (String)closestNavPointField.GetValue(navigator);
+            return navPoints[closestNavPointKey];
         }
 
         private NavPoint AStarPathFinder(String searchForNavpoint) {
