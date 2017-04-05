@@ -7,12 +7,17 @@ using POSH.sys.annotations;
 using Posh_sharp.POSHBot.util;
 using POSH.sys.strict;
 using System.Net.Sockets;
+using System.Threading;
 //import utilityfns
 
 namespace Posh_sharp.POSHBot
 {
     public class AdvancedCombat : AdvancedUTBehaviour
     {
+
+        private readonly static int shortShootMS = 1500;
+
+        private volatile int shootCounter = 0;
 
         // You must list all actions here
         private readonly static string[] actions = new string[] {
@@ -122,7 +127,17 @@ namespace Posh_sharp.POSHBot
         [ExecutableAction("com_shoot_attacker")]
         public bool com_shoot_attacker()
         {
-            return GetCombat().ShootAttacker();
+            GetCombat().ShootAttacker();
+            Interlocked.Increment(ref this.shootCounter);
+            new Thread(() => {
+                Thread.Sleep(shortShootMS);
+                int shootValue = Interlocked.Decrement(ref this.shootCounter);
+                if (shootValue == 0) {
+                    SendMessageAsync("STOPSHOOT", new Dictionary<string, string>());
+                }
+            }).Start();
+
+            return true;
         }
 
     }

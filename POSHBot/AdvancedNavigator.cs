@@ -4,12 +4,13 @@ using POSH.sys;
 using System.Collections.Generic;
 using POSH.sys.annotations;
 using System.Reflection;
+using static Posh_sharp.POSHBot.util.NavPoint;
 
 namespace Posh_sharp.POSHBot {
     public class AdvancedNavigator : AdvancedUTBehaviour {
 
         private readonly FieldInfo navPointsField;
-    
+        private readonly FieldInfo closestNavPointField;
 
         // You must list all actions here
         private readonly static string[] actions = new string[] {
@@ -31,6 +32,7 @@ namespace Posh_sharp.POSHBot {
         public AdvancedNavigator(AgentBase agent) : base(agent, actions, senses) {
             Type fieldsType = typeof(Navigator);
             navPointsField = fieldsType.GetField("navPoints", BindingFlags.NonPublic | BindingFlags.Instance);
+            closestNavPointField = fieldsType.GetField("__closestNavpointID__", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         [ExecutableAction("nav_select_navpoint")]
@@ -57,9 +59,8 @@ namespace Posh_sharp.POSHBot {
         public bool SetEnemyBaseAsNavPoint() {
             NavPoint enemyBasePos = GetMovement().info.enemyBasePos;
             if(enemyBasePos != null) {
-                //GetNavigator().select_navpoint();
-                GetNavigator().MovedToNavpoint(enemyBasePos);
-                //GetNavigator().select_navpoint(enemyBasePos.Id);
+                NavPoint nextBestNavPoint = AStarPathFinder(enemyBasePos.Id);
+                GetNavigator().select_navpoint(nextBestNavPoint.Id);
             } else {
                 GetNavigator().select_navpoint();
             }
@@ -111,13 +112,52 @@ namespace Posh_sharp.POSHBot {
             return GetNavigator().selected_navpoint_reachable();
         }
 
-        private bool AStarPathFinder() {
+        private NavPoint AStarPathFinder(String searchForNavpoint) {
             Navigator navigator = GetNavigator();
             Dictionary<string, NavPoint> navPoints = (Dictionary<string, NavPoint>) navPointsField.GetValue(navigator);
+            navigator.close_navpoint();
+            String closestNavPointKey = (String)closestNavPointField.GetValue(navigator);
+            NavPoint closestNavPoint = navPoints[closestNavPointKey];
 
+            if (searchForNavpoint.Equals(closestNavPointKey)) {
+                return closestNavPoint;
+            }
 
+            HashSet<String> allNavPointIds = new HashSet<String>(navPoints.Keys); 
 
-            return true;
+            HashSet<String> usedNavPointIds = new HashSet<String>();
+            usedNavPointIds.Add(closestNavPoint.Id);
+
+            List<Tuple<NavPoint, NavPoint>> currentNavPointPairList = new List<Tuple<NavPoint, NavPoint>>();
+
+            foreach(Neighbor navPoint in closestNavPoint.NGP) {
+                String id = navPoint.Id;
+                NavPoint neighbourNavPoint = navPoints[id];
+                if (id.Equals(searchForNavpoint)) {
+                    return neighbourNavPoint;
+                }
+                usedNavPointIds.Add(id);
+                currentNavPointPairList.Add(new Tuple<NavPoint, NavPoint>(neighbourNavPoint, neighbourNavPoint));
+            }
+
+            while(!usedNavPointIds.SetEquals(allNavPointIds) || currentNavPointPairList.Count == 0) {
+                List<Tuple<NavPoint, NavPoint>> newNavPointSet = new List<Tuple<NavPoint, NavPoint>>();
+                foreach (Tuple<NavPoint, NavPoint> navPointTuple in currentNavPointPairList) {
+                    foreach (Neighbor navPoint in navPointTuple.Second.NGP) {
+                        String id = navPoint.Id;
+                        NavPoint neighbourNavPoint = navPoints[id];
+                        if (id.Equals(searchForNavpoint)) {
+                            return navPointTuple.First;
+                        } else if (!usedNavPointIds.Contains(id)) {
+                            usedNavPointIds.Add(id);
+                            newNavPointSet.Add(new Tuple<NavPoint, NavPoint>(navPointTuple.First, neighbourNavPoint));
+                        }
+                    }
+                }
+                currentNavPointPairList = newNavPointSet;
+            }
+          
+            return closestNavPoint;
         }
 
     }

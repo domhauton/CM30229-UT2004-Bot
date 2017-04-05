@@ -12,7 +12,7 @@ namespace Posh_sharp.POSHBot {
     public class AdvancedMovement : AdvancedUTBehaviour {
 
         private readonly static int doubleJumpWaitTimerMS = 150;
-        private readonly static int jumpDelayMS = 500;
+        private readonly static int jumpDelayMS = 750;
         private readonly static int shortCrouchTimeMS = 1500;
 
         private volatile int crouchCounter = 0; 
