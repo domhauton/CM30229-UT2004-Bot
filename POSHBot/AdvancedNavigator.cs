@@ -62,7 +62,7 @@ namespace Posh_sharp.POSHBot {
         public bool SetEnemyBaseAsNavPoint() {
             if(ourRoughFlagPosition == null || theirRoughFlagPosition == null) {
                 NavPoint ourNavPoint = GetClosestNavPoint();
-                Tuple<NavPoint, NavPoint> result = CalcCloseAndFurthestNav(ourNavPoint, 3);
+                Tuple<NavPoint, NavPoint> result = CalcCloseAndFurthestNav(ourNavPoint, 2);
                 ourRoughFlagPosition = result.First;
                 theirRoughFlagPosition = CalcCloseAndFurthestNav(result.Second, 3).First;
             }
@@ -76,9 +76,9 @@ namespace Posh_sharp.POSHBot {
         public bool SetOurBaseAsNavPoint() {
             if (ourRoughFlagPosition == null || theirRoughFlagPosition == null) {
                 NavPoint ourNavPoint = GetClosestNavPoint();
-                Tuple<NavPoint, NavPoint> result = CalcCloseAndFurthestNav(ourNavPoint, 3);
+                Tuple<NavPoint, NavPoint> result = CalcCloseAndFurthestNav(ourNavPoint, 2);
                 ourRoughFlagPosition = result.First;
-                theirRoughFlagPosition = CalcCloseAndFurthestNav(result.Second, 3).First;
+                theirRoughFlagPosition = CalcCloseAndFurthestNav(result.Second, 2).First;
             }
 
             NavPoint nextBestNavPoint = AStarPathFinder(ourRoughFlagPosition.Id);

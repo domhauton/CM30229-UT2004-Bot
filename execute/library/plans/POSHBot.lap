@@ -38,7 +38,7 @@
 	(C C-retrace-back (seconds 0.3) (goal ((mov_is_at_own_base 1.0 =)))
 		(elements
 			((CE-retrace-navpoint			(trigger ((nav_is_target_selected 1.0 =) (nav_has_reached_target 0.0 =)))	C-move-to-selected-nav))
-			((CE-retrace-home				(trigger ((nav_is_close_to_navpoint 1.0 =)))								nav_retrace_navpoint))
+			((CE-retrace-home				(trigger ((nav_is_close_to_navpoint 1.0 =)))								nav_select_our_base))
 		)
 	)
 	(C C-get-own-flag (seconds 1.0) (goal ((com_is_our_flag_on_ground 1.0 !=)))
