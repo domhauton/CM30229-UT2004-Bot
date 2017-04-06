@@ -1,23 +1,47 @@
 \documentclass[a4paper,12pt,twocolumn]{report}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-\usepackage{natbib}   % omit 'round' option if you prefer square brackets
 \usepackage{hyperref}
-\graphicspath{ {imgs/} }
+\usepackage{titlesec}
 
+\graphicspath{ {imgs/} }
+\titlespacing*{\subsubsection}{0pt}{0.50\baselineskip}{0.25\baselineskip}
 
 %opening
-\title{Unreal Touranment 2004 - GameBot AI}
+\title{Unreal Touranment 2004 - GameBot Observations}
 \author{Dominic Hauton}
-
-
 
 \begin{document}
 \maketitle
-\bibliographystyle{plainnat}
 
-\section{Introduction}
+\subsubsection{A* Pathfinding}
+Adding A* pathfinding allows the bots to navigate faster to thier destination as the bots no longer need to meander to their destination. Navigation to the enemy flag from the home base with pathfinding enabled was more than halved. 
 
-\bibliography{biblio1}
+\subsubsection{Regular Jumping}
+Detecting if the bot is stuck takes too long, so jumping on a regular basis leads to faster navigation and improves bullet dodging ability. Those bots that jumped on a regular basis were able to travel further through open fire and leave their base faster.
+
+\subsubsection{Crouching during Combat}
+Crouching while in combat allows the bots to shoot more accurately and reduces their visible profile. When bots enconter each other, those able to crouch consistently win against those that cannot.
+
+\subsubsection{Trigger Inheritance}
+The provided software tools did not provide any way for competencies to inherit triggers from action patterns or behaviours. This would have been useful multiple times, two examples being the requirement for ammo to shoot, or knowing where the enemy base is to navigate there.
+
+\subsubsection{Single Defender Bot}
+Having a single defender bot should help keep the base clear of enemies and stop enemies stealing the flag. This is partially true, sometimes the enemies were able to pick up the flag and leave the base, however, the defender bot was able to combat enemies loitering in our own base.
+
+\subsubsection{Plan Execution Speed}
+The BOD framework did not run at a consisent speed between simulations. Especially when in 'Debug' mode. This dramatically affected bot performance, as bots on a faster loop time were able to react much faster to events, demonstrating that planning speed can impact bot performance.
+
+\subsubsection{Downsides of Culture}
+Runner bots with the same goals acted similarly when faced with danger. This was detremental in some cases, for example bots standing in the way of other bots while shooting, whcih severly impacted combat performance in groups.
+
+\subsubsection{Benefits of Culture}
+By using three runner bots concurrently complete their goals, a much higher rate of flag retrieval is achieved. When two of the bots die the goal can still be achieved by the third bot. This is tested by using varying proprortions of defender and runner bots.
+
+\subsubsection{Latches}
+Using latches enabls behaviour persistence throughout multiple BOD cycles. When bot starts shooting and crouching for combat, it no longer has to stop shooting and stand up between cycles. This leads to more consistent and accurate combat.
+
+\subsubsection{Plan Simplification}
+Simplifying the plan makes the bot behaviour more predicatable and easier to debug. A cycle of adding drives to the plan until the desired behaiour is observed, proceeded by making those drives as simple as possible made bot behaviour easy to modify throughout development.
 
 \end{document}
