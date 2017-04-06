@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using POSH.sys.annotations;
 using System.Reflection;
 using static Posh_sharp.POSHBot.util.NavPoint;
+using System.Threading;
 
 namespace Posh_sharp.POSHBot {
     public class AdvancedNavigator : AdvancedUTBehaviour {
@@ -14,6 +15,10 @@ namespace Posh_sharp.POSHBot {
 
         private NavPoint ourRoughFlagPosition;
         private NavPoint theirRoughFlagPosition;
+
+        private bool moveToComplete = false;
+
+        private long doubleJumpCounter = 0;
 
         // You must list all actions here
         private readonly static string[] actions = new string[] {
@@ -61,10 +66,7 @@ namespace Posh_sharp.POSHBot {
         [ExecutableAction("nav_select_enemy_base")]
         public bool SetEnemyBaseAsNavPoint() {
             if(ourRoughFlagPosition == null || theirRoughFlagPosition == null) {
-                NavPoint ourNavPoint = GetClosestNavPoint();
-                Tuple<NavPoint, NavPoint> result = CalcCloseAndFurthestNav(ourNavPoint, 2);
-                ourRoughFlagPosition = result.First;
-                theirRoughFlagPosition = CalcCloseAndFurthestNav(result.Second, 3).First;
+                CalcBasesFromSpawn();
             }
             
              NavPoint nextBestNavPoint = AStarPathFinder(theirRoughFlagPosition.Id);
@@ -75,14 +77,52 @@ namespace Posh_sharp.POSHBot {
         [ExecutableAction("nav_select_our_base")]
         public bool SetOurBaseAsNavPoint() {
             if (ourRoughFlagPosition == null || theirRoughFlagPosition == null) {
-                NavPoint ourNavPoint = GetClosestNavPoint();
-                Tuple<NavPoint, NavPoint> result = CalcCloseAndFurthestNav(ourNavPoint, 2);
-                ourRoughFlagPosition = result.First;
-                theirRoughFlagPosition = CalcCloseAndFurthestNav(result.Second, 2).First;
+                CalcBasesFromSpawn();
             }
 
             NavPoint nextBestNavPoint = AStarPathFinder(ourRoughFlagPosition.Id);
             GetNavigator().select_navpoint(nextBestNavPoint.Id);
+            return true;
+        }
+
+        private void CalcBasesFromSpawn() {
+            NavPoint ourNavPoint = GetClosestNavPoint();
+            Tuple<NavPoint, NavPoint> fromOurPosition = CalcCloseAndFurthestNav(ourNavPoint, 2);
+            Tuple<NavPoint, NavPoint> fromFurthestPoint = CalcCloseAndFurthestNav(fromOurPosition.Second, 2);
+            Tuple<NavPoint, NavPoint> fromFurthestPointOfFurthestPoint = CalcCloseAndFurthestNav(fromFurthestPoint.Second, 2);
+            theirRoughFlagPosition = fromFurthestPoint.First;
+            ourRoughFlagPosition = fromFurthestPointOfFurthestPoint.First;
+        }
+
+        [ExecutableAction("nav_navigate_to_enemy_base")]
+        public bool CompositeNavigateToEnemyBase() {
+            SetEnemyBaseAsNavPoint();
+            if (Interlocked.Increment(ref this.doubleJumpCounter) % 16 == 0) {
+                GetAdvancedMovement().DelayedDoubleJump();
+            }
+            GetAdvancedMovement().mov_move_to_navpoint();
+            //Thread.Sleep(500);
+            //if(!IsAtEnemyBase()) {
+            //    GetAdvancedMovement().mov_stop_bot();
+            //    SetEnemyBaseAsNavPoint();
+            //    GetAdvancedMovement().mov_move_to_navpoint();
+            //}
+            return true;
+        }
+
+        [ExecutableAction("nav_navigate_to_our_base")]
+        public bool CompositeNavigateToOurBase() {
+            SetOurBaseAsNavPoint();
+            if(Interlocked.Increment(ref this.doubleJumpCounter) % 16 == 0) {
+                GetAdvancedMovement().DelayedDoubleJump();
+            }
+            GetAdvancedMovement().mov_move_to_navpoint();
+            //Thread.Sleep(500);
+            //if (!IsAtOwnBase()) {
+            //    GetAdvancedMovement().mov_stop_bot();
+            //    SetOurBaseAsNavPoint();
+            //    GetAdvancedMovement().mov_move_to_navpoint();
+            //}
             return true;
         }
 
@@ -96,8 +136,21 @@ namespace Posh_sharp.POSHBot {
         /// returns 1 if we're near enough to our own base
         /// </summary>
         [ExecutableSense("nav_is_at_own_base")]
-        public bool nav_at_own_base() {
-            return GetNavigator().at_own_base();
+        public bool IsAtOwnBase() {
+            if (ourRoughFlagPosition == null || theirRoughFlagPosition == null) {
+                CalcBasesFromSpawn();
+            }
+            NavPoint currentPosition = GetClosestNavPoint();
+            return currentPosition.Id == ourRoughFlagPosition.Id;
+        }
+
+        [ExecutableSense("nav_is_at_enemy_flag")]
+        public bool IsAtEnemyBase() {
+            if (ourRoughFlagPosition == null || theirRoughFlagPosition == null) {
+                CalcBasesFromSpawn();
+            }
+            NavPoint currentNavPoint = GetClosestNavPoint();
+            return theirRoughFlagPosition.Id == currentNavPoint.Id;
         }
 
 
@@ -237,7 +290,6 @@ namespace Posh_sharp.POSHBot {
           
             return closestNavPoint;
         }
-
     }
 }
 

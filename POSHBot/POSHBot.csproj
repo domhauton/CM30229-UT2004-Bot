@@ -87,7 +87,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="plans\defendbot.lap" />
+    <None Include="plans\FlagDefenderBot.lap">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="plans\oldPOSH-attackbot.lap" />
+    <None Include="plans\FlagRunnerBot.lap">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="plans\POSHBot.lap">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

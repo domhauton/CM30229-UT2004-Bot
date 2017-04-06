@@ -15,9 +15,10 @@ namespace Posh_sharp.POSHBot
     public class AdvancedCombat : AdvancedUTBehaviour
     {
 
-        private readonly static int shortShootMS = 1500;
+        private readonly static int shortShootMS = 1000;
 
         private volatile int shootCounter = 0;
+        private volatile int spinCounter = 0;
 
         // You must list all actions here
         private readonly static string[] actions = new string[] {
@@ -137,6 +138,15 @@ namespace Posh_sharp.POSHBot
                 }
             }).Start();
 
+            return true;
+        }
+
+        [ExecutableAction("com_prepare_attack")]
+        public bool PrepareAttack() {
+            GetAdvancedMovement().CrouchShort();
+            if (Interlocked.Increment(ref this.spinCounter) % 8 == 0) {
+                GetMovement().BigRotate();
+            }
             return true;
         }
 

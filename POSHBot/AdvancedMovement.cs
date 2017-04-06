@@ -13,7 +13,7 @@ namespace Posh_sharp.POSHBot {
 
         private readonly static int doubleJumpWaitTimerMS = 150;
         private readonly static int jumpDelayMS = 750;
-        private readonly static int shortCrouchTimeMS = 1500;
+        private readonly static int shortCrouchTimeMS = 1000;
 
         private volatile int crouchCounter = 0; 
 

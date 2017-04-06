@@ -66,6 +66,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="library\plans\FlagDefenderBot.lap">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="library\plans\FlagRunnerBot.lap">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="library\plans\POSHBot.lap">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

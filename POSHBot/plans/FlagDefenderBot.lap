@@ -9,6 +9,7 @@
 	))
 	(AP AP-attack-carrier (seconds 0.3) (
 		com_run_to_enemy_carrying_our_flag
+		mov_crouch_short
 		com_shoot_enemy_carrying_our_flag
 	))
 	(AP AP-attack-any-enemy (seconds 0.3) (
@@ -16,6 +17,9 @@
 		com_face_attacker
 		mov_crouch_short
 		com_shoot_attacker
+	))
+	(AP AP-prepare-attack (seconds 0.3) (
+		com_prepare_attack
 	))
 	(C C-move-to-selected-nav (seconds 0.5) (goal ((nav_has_reached_target 1.0 =)))
 		(elements
@@ -60,20 +64,20 @@
 	)
 	(C C-go-to-our-base (seconds 1.0) (goal ((nav_is_at_own_base 1.0 =)))
 		(elements
-			((CE-set-our-base-as-navpoint (trigger ((succeed)))					nav_navigate_to_our_base))
+			((CE-set-our-base-as-navpoint	(trigger ((succeed)))														nav_navigate_to_our_base))
 		)
 	)
 	(SRDC life (goal ((status_game_ended 1.0 =)))
 		(drives
+			
+			((pickup-enemy-flag				(trigger ((mov_is_enemy_flag_reachable 1.0 =)))								C-get-enemy-flag))
 			((attack-carrier				(trigger ((com_can_see_enemy_with_flag 1.0 =) (ArmedAndAmmo 1.0 =)))	AP-attack-carrier))
 			((attack-any-enemy				(trigger ((mov_see_enemy 1.0 =) (ArmedAndAmmo 1.0 =)))					AP-attack-any-enemy))
-			((return-own-flag				(trigger ((com_is_our_flag_on_ground 1.0 =)))							C-get-own-flag))
-			((get-enemy-flag-from-base		(trigger ((mov_is_enemy_flag_reachable 1.0 =)))							C-get-enemy-flag))
-			((return-enemy-flag				(trigger ((status_have_enemy_flag 1.0 =)))								C-go-to-our-base))
-			((walk-to-enemy-base			(trigger ((nav_is_at_enemy_flag 1.0 !=)))								C-go-to-enemy-base))
-			((wander_around					(trigger ((status_focusing_task 1.0 !=)))								C-wander-map))
-			((jump-obstacle					(trigger ((mov_is_stuck 1.0 =)))										AP-jump-obstacle))
-			((inch							(trigger ((succeed)))													AP-inch))
+			((return-own-flag				(trigger ((com_is_our_flag_on_ground 1.0 =)))								C-get-own-flag))
+			((return-our-flag				(trigger ((status_have_enemy_flag 1.0 =) (nav_is_at_own_base 1.0 !=)))		C-go-to-our-base))
+			((travel-to-base				(trigger ((nav_is_at_own_base 1.0 !=) (ArmedAndAmmo 1.0 =)))				C-go-to-our-base))
+			((crouched-attack				(trigger ((ArmedAndAmmo 1.0 =)))											AP-prepare-attack))
+			((wander_around					(trigger ((succeed)))														C-go-to-enemy-base))
 		)
 	)
 )

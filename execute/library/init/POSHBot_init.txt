@@ -3,26 +3,50 @@
 # Note: Gamebots does not seem to set the names of the bots properly so botname
 # won't be used.
 
-[POSHBot]
+[FlagDefenderBot]
 POSHBot.botname = Bot11
 POSHBot.team = 1
 POSHBot.ip = 127.0.0.1
 POSHBot.port = 3000
 
-[POSHBot]
+[FlagRunnerBot]
 POSHBot.botname = Bot12
 POSHBot.team = 1
 POSHBot.ip = 127.0.0.1
 POSHBot.port = 3000
 
-[POSHBot]
+[FlagRunnerBot]
+POSHBot.botname = Bot13
+POSHBot.team = 1
+POSHBot.ip = 127.0.0.1
+POSHBot.port = 3000
+
+[FlagRunnerBot]
+POSHBot.botname = Bot14
+POSHBot.team = 1
+POSHBot.ip = 127.0.0.1
+POSHBot.port = 3000
+
+[FlagDefenderBot]
 POSHBot.botname = Bot21
 POSHBot.team = 2
 POSHBot.ip = 127.0.0.1
 POSHBot.port = 3000
 
-[POSHBot]
+[FlagRunnerBot]
 POSHBot.botname = Bot22
+POSHBot.team = 2
+POSHBot.ip = 127.0.0.1
+POSHBot.port = 3000
+
+[FlagRunnerBot]
+POSHBot.botname = Bot23
+POSHBot.team = 2
+POSHBot.ip = 127.0.0.1
+POSHBot.port = 3000
+
+[FlagRunnerBot]
+POSHBot.botname = Bot24
 POSHBot.team = 2
 POSHBot.ip = 127.0.0.1
 POSHBot.port = 3000
