@@ -8,40 +8,40 @@
 \titlespacing*{\subsubsection}{0pt}{0.50\baselineskip}{0.25\baselineskip}
 
 %opening
-\title{Unreal Touranment 2004 - GameBot Observations}
+\title{Unreal Tournament 2004 - GameBot Observations}
 \author{Dominic Hauton}
 
 \begin{document}
 \maketitle
 
-\subsubsection{A* Pathfinding}
-Adding A* pathfinding allows the bots to navigate faster to thier destination as the bots no longer need to meander to their destination. Navigation to the enemy flag from the home base with pathfinding enabled was more than halved. 
+\subsubsection{Drive Fall Through}
+Detecting if the bot is stuck wastes an action, so the bot jumps on a regular basis regardless being stuck, which is wasteful but necessary for fast navigation. If some drives were allowed to fall through, this could be represented as a drive instead.
 
-\subsubsection{Regular Jumping}
-Detecting if the bot is stuck takes too long, so jumping on a regular basis leads to faster navigation and improves bullet dodging ability. Those bots that jumped on a regular basis were able to travel further through open fire and leave their base faster.
-
-\subsubsection{Crouching during Combat}
-Crouching while in combat allows the bots to shoot more accurately and reduces their visible profile. When bots enconter each other, those able to crouch consistently win against those that cannot.
+\subsubsection{Stopping Actions}
+After combat un-crouching and stopping shooting is difficult in BOD as every event that does not involve combat has to request this in the plan. A better method discovered was using an action timeout, that sent the ending command a few seconds after the plan completed as part of the initial behaviour.
 
 \subsubsection{Trigger Inheritance}
-The provided software tools did not provide any way for competencies to inherit triggers from action patterns or behaviours. This would have been useful multiple times, two examples being the requirement for ammo to shoot, or knowing where the enemy base is to navigate there.
+The provided software tools do not provide any way for drives and competencies to inherit triggers from behaviours. This would be useful to prevent user error, an example being the requirement for actions that shoot to check if the bot has ammo as a trigger.
 
-\subsubsection{Single Defender Bot}
-Having a single defender bot should help keep the base clear of enemies and stop enemies stealing the flag. This is partially true, sometimes the enemies were able to pick up the flag and leave the base, however, the defender bot was able to combat enemies loitering in our own base.
+\subsubsection{BOD Plan Checking}
+In the tools provided there is no way to check that there is always an action being performed. A tool to check if one of the drives will be satisfied in every case would be useful, similar checking that code always returns a value in a function.
 
 \subsubsection{Plan Execution Speed}
-The BOD framework did not run at a consisent speed between simulations. Especially when in 'Debug' mode. This dramatically affected bot performance, as bots on a faster loop time were able to react much faster to events, demonstrating that planning speed can impact bot performance.
+The BOD framework does not run at a consistent speed between simulations, especially when in Debug mode. This dramatically affects bot performance, as bots on a faster loop time are able to react much faster to events, demonstrating that planning rate can impact bot performance.
 
 \subsubsection{Downsides of Culture}
-Runner bots with the same goals acted similarly when faced with danger. This was detremental in some cases, for example bots standing in the way of other bots while shooting, whcih severly impacted combat performance in groups.
+Runner bots with the same goals acted similarly when faced with danger. This was detrimental in some cases, for example bots standing in the way of other bots while shooting, which severely impacted combat performance in groups.
 
 \subsubsection{Benefits of Culture}
-By using three runner bots concurrently complete their goals, a much higher rate of flag retrieval is achieved. When two of the bots die the goal can still be achieved by the third bot. This is tested by using varying proprortions of defender and runner bots.
+By using three runner bots concurrently complete their goals, a much higher rate of flag retrieval is achieved. When two of the bots die the goal can still be achieved by the third bot. This is tested by using varying proportions of defender and runner bots.
 
 \subsubsection{Latches}
-Using latches enabls behaviour persistence throughout multiple BOD cycles. When bot starts shooting and crouching for combat, it no longer has to stop shooting and stand up between cycles. This leads to more consistent and accurate combat.
+Using latches enables behaviour persistence throughout multiple BOD cycles. When a bot starts shooting and crouching for combat, it no longer has to stop shooting and stand up between cycles. This leads to more consistent and accurate combat.
 
 \subsubsection{Plan Simplification}
-Simplifying the plan makes the bot behaviour more predicatable and easier to debug. A cycle of adding drives to the plan until the desired behaiour is observed, proceeded by making those drives as simple as possible made bot behaviour easy to modify throughout development.
+Simplifying the plan makes the bot behaviour more predictable and easier to debug. A cycle of adding drives to the plan until the desired behaviour is observed, proceeded by making those drives as simple as possible made bot behaviour easy to modify throughout development.
+
+\subsubsection{A* Path Finding}
+Adding A* path finding allows the bots to navigate faster to their destination as the bots no longer need to meander to their destination. Navigation to the enemy flag from the home base with path finding enabled is more than halved. 
 
 \end{document}
